@@ -18,7 +18,7 @@ export const DISHES = [
     description: 'Deep fried Zucchini coasted with mildy spiced Chickpea flour batter accompanied with a sweet-tangy tamarind sauce.'
   },
   {
-    id: 3,
+    id: 2,
     name: 'Vadonut',
     image: 'assets/images/vadonut.png',
     category: 'appetizer',
