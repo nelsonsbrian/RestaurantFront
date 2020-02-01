@@ -7,8 +7,8 @@ class DishDetailComponent extends Component {
     this.state = {}
   }
 
-  renderdish(dish) {
-    dish == null ? <div className="row col-12 col-md-5 m-1"></div> :
+  renderDish(dish) {
+    return dish == null ? <div className="row col-12 col-md-5 m-1"></div> :
       <div className="row col-12 col-md-5 m-1">
         <Card>
           <CardImg width='100%' src={dish.image} alt={dish.name} />
@@ -22,10 +22,7 @@ class DishDetailComponent extends Component {
 
   render() {
     const { dish } = this.props;
-    return (
-      this.renderDish(dish)
-
-    );
+    return (this.renderDish(dish));
   }
 }
 
