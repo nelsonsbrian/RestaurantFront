@@ -6,6 +6,7 @@ import {
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm } from 'react-redux-form';
+import Loading from './LoadingComponent';
 
 function RenderDish({ dish, favorite, postFavorite }) {
   return (
@@ -31,7 +32,7 @@ function RenderDish({ dish, favorite, postFavorite }) {
 
 }
 
-function RenderComments({ comments, postComment, dishId }) {
+function RenderComments({ comments, addComment, dishId }) {
   if (comments != null)
     return (
       <div className="col-12 col-md-5 m-1">
@@ -47,7 +48,7 @@ function RenderComments({ comments, postComment, dishId }) {
             );
           })}
         </ul>
-        <CommentForm dishId={dishId} postComment={postComment} />
+        <CommentForm dishId={dishId} addComment={addComment} />
       </div>
     );
   else
@@ -78,7 +79,7 @@ class CommentForm extends Component {
 
   handleSubmit(values) {
     this.toggleModal();
-    this.props.postComment(this.props.dishId, values.rating, values.comment);
+    this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
   }
 
   render() {
@@ -121,7 +122,23 @@ class CommentForm extends Component {
 }
 
 const DishDetail = (props) => {
-  if (props.dish != null)
+  if (props.isLoading) {
+    return (
+      <div className="container">
+        <div className="row">
+          <Loading />
+        </div>
+      </div>
+    )
+  } else if (props.errMess) {
+    return (
+      <div className="container">
+        <div className="row">
+          <h4>{props.errMess}</h4>
+        </div>
+      </div>
+    )
+  } else {
     return (
       <div className="container">
         <div className="row">
@@ -137,15 +154,13 @@ const DishDetail = (props) => {
         <div className="row">
           <RenderDish dish={props.dish} favorite={props.favorite} postFavorite={props.postFavorite} />
           <RenderComments comments={props.comments}
-            postComment={props.postComment}
-            dishId={props.dish._id} />
+            // postComment={props.postComment}
+            addComment={props.addComment}
+            dishId={props.dishId} />
         </div>
       </div>
     );
-  else
-    return (
-      <div></div>
-    );
+  }
 }
 
 export default DishDetail;
