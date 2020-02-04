@@ -70,7 +70,6 @@ class Contact extends Component {
                     className="form-control"
                     name="firstname"
                     placeholder="First Name"
-                    onChange={this.handleInputChange}
                     validators={{
                       required,
                       minLength: minLength(3),
