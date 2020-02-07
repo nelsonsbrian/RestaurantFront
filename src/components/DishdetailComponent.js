@@ -6,49 +6,60 @@ import {
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm } from 'react-redux-form';
-import Loading from './LoadingComponent';
+import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
 function RenderDish({ dish, favorite, postFavorite }) {
   return (
     <div className="col-12 col-md-5 m-1">
-      <Card>
-        <CardImg top src={dish.image} alt={dish.name} />
-        <CardImgOverlay>
-          <Button outline color="primary" onClick={() => favorite ? console.log('Already favorite') : postFavorite(dish._id)}>
-            {favorite ?
-              <span className="fa fa-heart"></span>
-              :
-              <span className="fa fa-heart-o"></span>
-            }
-          </Button>
-        </CardImgOverlay>
-        <CardBody>
-          <CardTitle>{dish.name}</CardTitle>
-          <CardText>{dish.description}</CardText>
-        </CardBody>
-      </Card>
+      <FadeTransform in
+        transformProps={{
+          exitTransform: 'scale(0.5) translateY(-50%)'
+        }}>
+        <Card>
+          <CardImg top src={baseUrl + dish.image} alt={dish.name} />
+          <CardImgOverlay>
+            <Button outline color="primary" onClick={() => favorite ? console.log('Already favorite') : postFavorite(dish._id)}>
+              {favorite ?
+                <span className="fa fa-heart"></span>
+                :
+                <span className="fa fa-heart-o"></span>
+              }
+            </Button>
+          </CardImgOverlay>
+          <CardBody>
+            <CardTitle>{dish.name}</CardTitle>
+            <CardText>{dish.description}</CardText>
+          </CardBody>
+        </Card>
+      </FadeTransform>
     </div>
   );
 
 }
 
-function RenderComments({ comments, addComment, dishId }) {
+function RenderComments({ comments, postComment, dishId }) {
   if (comments != null)
     return (
       <div className="col-12 col-md-5 m-1">
         <h4>Comments</h4>
         <ul className="list-unstyled">
-          {comments.map((comment) => {
-            return (
-              <li>
-                <p>{comment.comment}</p>
-                <p>{comment.rating} stars</p>
-                <p>-- {comment.author.firstname} {comment.author.lastname} {comment.updatedAt}</p>
-              </li>
-            );
-          })}
+          <Stagger in>
+            {comments.map((comment) => {
+              return (
+                <Fade in key={comment._id}>
+                  <li>
+                    <p>{comment.comment}</p>
+                    <p>{comment.rating} stars</p>
+                    <p>-- {comment.author.firstname} {comment.author.lastname} , {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(Date.parse(comment.updatedAt)))}</p>
+                  </li>
+                </Fade>
+              );
+            })}
+          </Stagger>
         </ul>
-        <CommentForm dishId={dishId} addComment={addComment} />
+        <CommentForm dishId={dishId} postComment={postComment} />
       </div>
     );
   else
@@ -79,7 +90,7 @@ class CommentForm extends Component {
 
   handleSubmit(values) {
     this.toggleModal();
-    this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+    this.props.postComment(this.props.dishId, values.rating, values.comment);
   }
 
   render() {
@@ -129,16 +140,18 @@ const DishDetail = (props) => {
           <Loading />
         </div>
       </div>
-    )
-  } else if (props.errMess) {
+    );
+  }
+  else if (props.errMess) {
     return (
       <div className="container">
         <div className="row">
           <h4>{props.errMess}</h4>
         </div>
       </div>
-    )
-  } else {
+    );
+  }
+  else if (props.dish != null)
     return (
       <div className="container">
         <div className="row">
@@ -154,13 +167,15 @@ const DishDetail = (props) => {
         <div className="row">
           <RenderDish dish={props.dish} favorite={props.favorite} postFavorite={props.postFavorite} />
           <RenderComments comments={props.comments}
-            // postComment={props.postComment}
-            addComment={props.addComment}
-            dishId={props.dishId} />
+            postComment={props.postComment}
+            dishId={props.dish._id} />
         </div>
       </div>
     );
-  }
+  else
+    return (
+      <div></div>
+    );
 }
 
 export default DishDetail;
